@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://analyse-flotte.com/sitemap.xml
