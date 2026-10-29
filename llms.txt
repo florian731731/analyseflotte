@@ -1,2 +1,2 @@
-# Adalia Solutions
-Solution de géolocalisation GPS pour flottes professionnelles en France : BTP, transport, maintenance, paysagistes, artisans, PME multi-véhicules.
+# Analyse Flotte
+Géolocalisation GPS pour flottes professionnelles en France (BTP, transport, maintenance, paysagistes, artisans, PME multi-véhicules). Basé en Savoie. Analyse gratuite de flotte : https://analyse-flotte.com/contact/

@@ -135,3 +135,74 @@ function updateCalc() {
   if (el) el.addEventListener('input', updateCalc);
 });
 updateCalc();
+
+// === FORMULAIRES WEB3FORMS (AJAX, message de succès en français, sans redirection) ===
+document.querySelectorAll('form[action="https://api.web3forms.com/submit"]').forEach(form => {
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const btn = form.querySelector('button[type="submit"]');
+    const btnLabel = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Envoi en cours...'; }
+
+    const formData = new FormData(form);
+    const object = Object.fromEntries(formData);
+    delete object.redirect; // on gère l'affichage nous-mêmes, pas besoin de redirection
+    const json = JSON.stringify(object);
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: json
+    })
+      .then(async (response) => {
+        const result = await response.json();
+        if (response.status === 200) {
+          form.innerHTML =
+            '<div class="form-success">' +
+              '<div class="form-success-icon">✓</div>' +
+              '<h3>Merci, votre demande a bien été envoyée !</h3>' +
+              '<p>Florian vous recontacte sous 24h pour votre analyse gratuite.</p>' +
+            '</div>';
+        } else {
+          if (btn) { btn.disabled = false; btn.textContent = btnLabel; }
+          alert("Une erreur est survenue lors de l'envoi. Merci de réessayer, ou de nous contacter directement au 07 43 69 63 07.");
+        }
+      })
+      .catch(() => {
+        if (btn) { btn.disabled = false; btn.textContent = btnLabel; }
+        alert("Une erreur est survenue lors de l'envoi. Merci de réessayer, ou de nous contacter directement au 07 43 69 63 07.");
+      });
+  });
+});
+
+// === RÉACTIVITÉ SOURIS ===
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (!prefersReducedMotion) {
+  // Radar lumineux qui suit le curseur sur le tableau de bord (thème "suivi en direct")
+  const dashboardEl = document.querySelector('.gps-dashboard');
+  if (dashboardEl) {
+    dashboardEl.addEventListener('mousemove', (e) => {
+      const rect = dashboardEl.getBoundingClientRect();
+      dashboardEl.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+      dashboardEl.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+      dashboardEl.classList.add('glow-active');
+    });
+    dashboardEl.addEventListener('mouseleave', () => dashboardEl.classList.remove('glow-active'));
+  }
+
+  // Léger effet 3D au survol des cartes (discret, cohérent sur tout le site)
+  const tiltSelector = '.cout-card, .sol-card, .secteur-big, .blog-card, .cards article, .feature-list article';
+  document.querySelectorAll(tiltSelector).forEach(card => {
+    card.classList.add('tilt-card');
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width;
+      const py = (e.clientY - rect.top) / rect.height;
+      const rotateX = (0.5 - py) * 6;
+      const rotateY = (px - 0.5) * 6;
+      card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-3px)`;
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+  });
+}
